@@ -1,0 +1,5 @@
+grant codeBase "file:/Users/ningguangyuan/Desktop/*" {
+
+    permission java.security.AllPermission;  
+
+   };

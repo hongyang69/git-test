@@ -29,17 +29,17 @@ package com.tsty.initialize;
 
 public class Lower extends Upper {
 
-	// String lowerString = null;
-	// 打印结果是：
 
 	/**
 	 * 当String lowerString = null;打印结果是 Upper: upperInited Lower: null
 	 */
-	String lowerString;
+//	 String lowerString = null;
+	// 打印结果是：
 
 	/**
 	 * 当String lowerString;打印结果是 Upper: upperInited Lower: lowerInited
 	 */
+	String lowerString;
 
 	public Lower() {
 		super();

@@ -5,5 +5,10 @@
 	<classpathentry kind="lib" path="lib/commonsCodec/commons-codec-1.8.jar"/>
 	<classpathentry kind="lib" path="lib/bouncyCastle/bcprov-ext-jdk15on-151.jar"/>
 	<classpathentry kind="lib" path="lib/bouncyCastle/bcprov-jdk15on-151.jar"/>
+	<classpathentry kind="lib" path="lib/cglib/asm-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/cglib/asm-commons-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/cglib/asm-util-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/cglib/cglib-nodep-2.1_3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

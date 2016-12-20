@@ -69,7 +69,7 @@ public class BookFacadeProxy implements InvocationHandler {
         this.target = target;  
         //取得代理对象  
         return Proxy.newProxyInstance(target.getClass().getClassLoader(),  
-                target.getClass().getInterfaces(), this);   //要绑定接口(这是一个缺陷，cglib弥补了这一缺陷)  
+                target.getClass().getInterfaces(), this);   //要绑定接口(这是一个缺陷(要实现委托，必须要实现一个接口)，cglib弥补了这一缺陷)  
     }  
   
     @Override  
