@@ -9,6 +9,8 @@
 	<classpathentry kind="lib" path="lib/cglib/asm-commons-2.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/cglib/asm-util-2.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/cglib/cglib-nodep-2.1_3.jar"/>
+	<classpathentry kind="lib" path="lib/apache/commons-io-2.5.jar"/>
+	<classpathentry kind="lib" path="lib/apache/commons-lang3-3.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
