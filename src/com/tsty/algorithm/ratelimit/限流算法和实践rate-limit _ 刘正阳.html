@@ -1,0 +1,1030 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Algorithm," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="刘正阳" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="实现一个限制一定时间执行次数的限制次数的工具。常用于防止攻击防刷等。例如，1个ip1分钟内最多访问10次。还可分为单个应用内的次数限制以及全局的限制。
+算法速率限制的传统算法是令牌桶(token bucket)以及Leaky bucket，提供一个滑动窗口控制速率。常用于流量整形和流量控制，如带宽的限制。
+令牌桶算法令牌桶会以一定速率产生令牌放入桶中，满了以后会丢弃或暂停产生，数据通过时需要持有一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="限流算法和实践rate-limit">
+<meta property="og:url" content="http://liuzhengyang.github.io/2016/12/15/rate-limit/index.html">
+<meta property="og:site_name" content="刘正阳">
+<meta property="og:description" content="实现一个限制一定时间执行次数的限制次数的工具。常用于防止攻击防刷等。例如，1个ip1分钟内最多访问10次。还可分为单个应用内的次数限制以及全局的限制。
+算法速率限制的传统算法是令牌桶(token bucket)以及Leaky bucket，提供一个滑动窗口控制速率。常用于流量整形和流量控制，如带宽的限制。
+令牌桶算法令牌桶会以一定速率产生令牌放入桶中，满了以后会丢弃或暂停产生，数据通过时需要持有一">
+<meta property="og:image" content="http://oek9m2h2f.bkt.clouddn.com/token%20bucket.png">
+<meta property="og:image" content="http://oek9m2h2f.bkt.clouddn.com/leak%20bucket.png">
+<meta property="og:updated_time" content="2017-01-02T01:47:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="限流算法和实践rate-limit">
+<meta name="twitter:description" content="实现一个限制一定时间执行次数的限制次数的工具。常用于防止攻击防刷等。例如，1个ip1分钟内最多访问10次。还可分为单个应用内的次数限制以及全局的限制。
+算法速率限制的传统算法是令牌桶(token bucket)以及Leaky bucket，提供一个滑动窗口控制速率。常用于流量整形和流量控制，如带宽的限制。
+令牌桶算法令牌桶会以一定速率产生令牌放入桶中，满了以后会丢弃或暂停产生，数据通过时需要持有一">
+<meta name="twitter:image" content="http://oek9m2h2f.bkt.clouddn.com/token%20bucket.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'liuzhengyang'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://liuzhengyang.github.io/2016/12/15/rate-limit/"/>
+
+
+  <title> 限流算法和实践rate-limit | 刘正阳 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-81248957-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?08b46d274cbc903db4f3c371a40a669f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">刘正阳</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-graduation-cap"></i> <br />
+            
+            简历
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                限流算法和实践rate-limit
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-12-15T13:40:24+08:00" content="2016-12-15">
+              2016-12-15
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/12/15/rate-limit/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/15/rate-limit/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2016/12/15/rate-limit/" class="leancloud_visitors" data-flag-title="限流算法和实践rate-limit">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+              &nbsp; | &nbsp;
+              <span class="page-pv"><i class="fa fa-file-o"></i>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+              </span>
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>实现一个限制一定时间执行次数的限制次数的工具。常用于防止攻击防刷等。<br>例如，1个ip1分钟内最多访问10次。<br>还可分为单个应用内的次数限制以及全局的限制。</p>
+<h1 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h1><p>速率限制的传统算法是令牌桶(token bucket)以及Leaky bucket，提供一个滑动窗口控制速率。<br>常用于流量整形和流量控制，如带宽的限制。</p>
+<h2 id="令牌桶算法"><a href="#令牌桶算法" class="headerlink" title="令牌桶算法"></a>令牌桶算法</h2><p>令牌桶会以一定速率产生令牌放入桶中，满了以后会丢弃或暂停产生，数据通过时需要持有一个令牌，没有令牌说明超过了速率限制。令牌桶算法允许突发流量，如突然将桶内令牌都消耗完成。<br><a id="more"></a></p>
+<p><img src="http://oek9m2h2f.bkt.clouddn.com/token%20bucket.png" alt="令牌桶算法"></p>
+<h2 id="漏桶算法"><a href="#漏桶算法" class="headerlink" title="漏桶算法"></a>漏桶算法</h2><p>漏桶算法中，水以一定速率放到漏桶里，然后漏桶以一定的速率向外流水。所以最大的速率就是出水的速率。不能出现突发流量。</p>
+<p><img src="http://oek9m2h2f.bkt.clouddn.com/leak%20bucket.png" alt="漏桶算法"></p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="其他需求"><a href="#其他需求" class="headerlink" title="其他需求"></a>其他需求</h2><p>RateLimit除了基本的速率限制外还可能有一些其他的需求<br>如</p>
+<ol>
+<li>分布式，这样就可以跨进程共享; </li>
+<li>滑动窗口: 如果我们限制1分钟10个，不能出现0分钟59秒执行10个，1分钟1秒后执行10个</li>
+<li>消息间的最小间隔，防止消息爆炸集中突发</li>
+</ol>
+<h2 id="使用redis实现"><a href="#使用redis实现" class="headerlink" title="使用redis实现"></a>使用redis实现</h2><p>使用redis作为一个集中的远程数据管理中心，解决多机器多进程间的数据协调问题。<br><a href="https://redis.io/commands/incr#pattern-rate-limiter-2" target="_blank" rel="external">Redis</a> 官网提供了一个使用例子，大体思路是添加一个计数key，并设置它的expire过期时间。<br>根据计数器的值来断定是否超过了次数。</p>
+<h3 id="实现一"><a href="#实现一" class="headerlink" title="实现一"></a>实现一</h3><p>下面是一个简单的实现，限制一个ip只能访问THRE_SHOLD次，<br><figure class="highlight gauss"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">String</span> <span class="built_in">time</span> = <span class="keyword">String</span>.valueOf(<span class="keyword">new</span> <span class="built_in">Date</span>().getTime() / <span class="number">1000</span>);</div><div class="line"><span class="keyword">String</span> <span class="built_in">key</span> = ip + <span class="string">":"</span> + <span class="built_in">time</span>;</div><div class="line">Jedis jedis = JedisFactory.getJedis();</div><div class="line"><span class="keyword">String</span> s = jedis.get(<span class="built_in">key</span>);</div><div class="line"><span class="keyword">if</span> (StringUtils.isNotEmpty(s) &amp;&amp; Long.parseLong(s) &gt;= THRE_SHOLD) &#123;</div><div class="line">    LOGGER.info(<span class="string">"exceed max number per interval"</span>);</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">    Long incr = jedis.incr(<span class="built_in">key</span>);</div><div class="line">    Long expire = jedis.expire(<span class="built_in">key</span>, <span class="number">3</span>);</div><div class="line">    LOGGER.info(<span class="string">"Run"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>如果要实现1分钟10次限制，可以将除以1000的地方改成除以60* 1000，但是不能满足上述其他需求中的第二点。</p>
+<h3 id="实现二"><a href="#实现二" class="headerlink" title="实现二"></a>实现二</h3><p>另一种方式为每个ip使用一个计数器<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">String s = jedis.get(ip);</div><div class="line"><span class="keyword">if</span> (StringUtils.isNotEmpty(s) &amp;&amp; <span class="keyword">Long</span>.parseLong(s) &gt; <span class="number">10</span>) &#123;</div><div class="line">    System.out.<span class="keyword">println</span>(<span class="string">"Exceed max number"</span>);</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">    <span class="keyword">long</span> <span class="keyword">count</span> = jedis.incr(ip);</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">count</span> == <span class="number">1</span>) &#123;</div><div class="line">        jedis.expire(ip, <span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line">    System.out.<span class="keyword">println</span>(<span class="string">"Run"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这种方式有一个危险的地方，如果一个client执行了incr但没有执行expire，会导致这个key一直不失效。</p>
+<p>另一种方式是通过redis的list数据结构和MULTI事务支持, 这样的缺点是在限制次数较大时会占用很多redis内存<br><figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">FUNCTION LIMIT_API_CALL(<span class="name">ip</span>)</div><div class="line">current = LLEN(<span class="name">ip</span>)</div><div class="line">IF current &gt; <span class="number">10</span> THEN</div><div class="line">    ERROR <span class="string">"too many requests per second"</span></div><div class="line">ELSE</div><div class="line">    IF EXISTS(<span class="name">ip</span>) == FALSE</div><div class="line">        MULTI</div><div class="line">            RPUSH(<span class="name">ip</span>,ip)</div><div class="line">            EXPIRE(<span class="name">ip</span>,<span class="number">1</span>)</div><div class="line">        EXEC</div><div class="line">    ELSE</div><div class="line">        RPUSHX(<span class="name">ip</span>,ip)</div><div class="line">    END</div><div class="line">    PERFORM_API_CALL()</div><div class="line">END</div></pre></td></tr></table></figure></p>
+<h2 id="使用Guava实现"><a href="#使用Guava实现" class="headerlink" title="使用Guava实现"></a>使用Guava实现</h2><p>Guava中的RateLimit可以用于速率限制，和Semaphore不同，Semaphore用于限制资源的并发获取数量，RateLimit限制速率，但是并发量和速率又是有一定的关联。<br>acquire()方法会阻塞调用，tryAcquire()会直接返回true和false表示是否获取到的许可。<br><code>RateLimit.create()</code>方法的参数表示1秒内允许获得的数量。RateLimiter的实现中<code>SmoothRateLimiter</code>会限制获取的间隔时间，例如参数是10的RateLimiter, T0请求时间是0.0s, T1在0.01秒请求是会wait到0.1秒才能被执行。<br><figure class="highlight gauss"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 创建一个1秒钟限制执行10次的RateLimitter</span></div><div class="line">RateLimiter rateLimiter = RateLimiter.<span class="keyword">create</span>(<span class="number">10</span>);</div><div class="line"></div><div class="line"><span class="keyword">for</span> (int i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</div><div class="line">    rateLimiter.acquire(<span class="number">1</span>);</div><div class="line">    <span class="keyword">System</span>.out.println(<span class="string">"acquirer success "</span> + <span class="keyword">new</span> <span class="built_in">Date</span>().getTime());</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>从这个日志也可以看出获取的间隔时间。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a href="https://engineering.classdojo.com/blog/2015/02/06/rolling-rate-limiter/" target="_blank" rel="external">https://engineering.classdojo.com/blog/2015/02/06/rolling-rate-limiter/</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Token_bucket" target="_blank" rel="external">https://en.wikipedia.org/wiki/Token_bucket</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Leaky_bucket" target="_blank" rel="external">https://en.wikipedia.org/wiki/Leaky_bucket</a></li>
+<li><a href="https://redis.io/commands/incr#pattern-rate-limiter-2" target="_blank" rel="external">https://redis.io/commands/incr#pattern-rate-limiter-2</a></li>
+<li><a href="https://www.google.com/patents/CN1536815A?cl=zh" target="_blank" rel="external">https://www.google.com/patents/CN1536815A?cl=zh</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+<div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/wechat.png" alt="liuzhengyang wechat" style="width: 200px; max-width: 100%;"/>
+    <div></div>
+</div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/images/wechat.png" alt="liuzhengyang WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/images/ali.jpg" alt="liuzhengyang Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Algorithm/" rel="tag">#Algorithm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/30/zk/" rel="next" title="zk">
+                <i class="fa fa-chevron-left"></i> zk
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/16/rpc-principle/" rel="prev" title="rpc-principle">
+                rpc-principle <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/12/15/rate-limit/"
+     data-title="限流算法和实践rate-limit"
+     data-content=""
+     data-url="http://liuzhengyang.github.io/2016/12/15/rate-limit/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/12/15/rate-limit/"
+           data-title="限流算法和实践rate-limit" data-url="http://liuzhengyang.github.io/2016/12/15/rate-limit/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="liuzhengyang" />
+          <p class="site-author-name" itemprop="name">liuzhengyang</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liuzhengyang" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#算法"><span class="nav-number">1.</span> <span class="nav-text">算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#令牌桶算法"><span class="nav-number">1.1.</span> <span class="nav-text">令牌桶算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏桶算法"><span class="nav-number">1.2.</span> <span class="nav-text">漏桶算法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#其他需求"><span class="nav-number">2.1.</span> <span class="nav-text">其他需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用redis实现"><span class="nav-number">2.2.</span> <span class="nav-text">使用redis实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现一"><span class="nav-number">2.2.1.</span> <span class="nav-text">实现一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现二"><span class="nav-number">2.2.2.</span> <span class="nav-text">实现二</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Guava实现"><span class="nav-number">2.3.</span> <span class="nav-text">使用Guava实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">2.4.</span> <span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liuzhengyang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"liuzhengyang"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("S1GRvf5tQIaTseeCeEgRArcy-gzGzoHsz", "N7TDdNmWqvjoomIaTQqesTKA");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+
+</body>
+</html>
