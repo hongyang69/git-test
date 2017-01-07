@@ -1,0 +1,279 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JSP中文乱码问题 - xingoo - 博客园</title>
+<link type="text/css" rel="stylesheet" href="/bundles/blog-common.css?v=03KQeESEmpLfzDqUo0NiWUg5Zd5aRam3JHBZTK05Wug1"/>
+<link id="MainCss" type="text/css" rel="stylesheet" href="/skins/BlueSky/bundle-BlueSky.css?v=_lYRTG5SjWWADGcuS8G-fWWj62fg5g8s6xd9-hRa-g01"/>
+<link type="text/css" rel="stylesheet" href="/blog/customcss/128528.css?v=BVETXqQj3jjsliONJLuYFtWAq04%3d"/>
+<link id="mobile-style" media="only screen and (max-width: 768px)" type="text/css" rel="stylesheet" href="/skins/BlueSky/bundle-BlueSky-mobile.css?v=kX2JhZREZd5q3hGusiiVYXO5na-zaEcYUzgtTyHNcgQ1"/>
+<link title="RSS" type="application/rss+xml" rel="alternate" href="http://www.cnblogs.com/xing901022/rss"/>
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="http://www.cnblogs.com/xing901022/rsd.xml"/>
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="http://www.cnblogs.com/xing901022/wlwmanifest.xml"/>
+<script src="//common.cnblogs.com/script/jquery.js" type="text/javascript"></script>  
+<script type="text/javascript">var currentBlogApp = 'xing901022', cb_enable_mathjax=true;var isLogined=false;</script>
+<script src="/bundles/blog-common.js?v=hH1lCMV8WaIu271Nx7jPuv36TENW9-RsSxziLxUpjtc1" type="text/javascript"></script>
+</head>
+<body>
+<a name="top"></a>
+<div id="page_begin_html"></div><script>load_page_begin_html();</script>
+
+<!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+	<a id="lnkBlogLogo" href="http://www.cnblogs.com/xing901022/"><img id="blogLogo" src="/Skins/custom/images/logo.gif" alt="返回主页" /></a>			
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle" href="http://www.cnblogs.com/xing901022/">xingoo</a></h1>
+<h2></h2>
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="http://www.cnblogs.com/">博客园</a></li>
+<li><a id="blog_nav_myhome" class="menu" href="http://www.cnblogs.com/xing901022/">首页</a></li>
+<li><a id="blog_nav_newpost" class="menu" rel="nofollow" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a></li>
+<li></li>
+<li>
+<!----></li>
+<li><a id="blog_nav_admin" class="menu" rel="nofollow" href="https://i.cnblogs.com/">管理</a></li>
+</ul>
+		<div class="blogStats">
+			
+			<div id="blog_stats">
+<span id="stats_post_count">随笔 - 862&nbsp; </span>
+<span id="stats_article_count">文章 - 0&nbsp; </span>
+<span id="stats-comment_count">评论 - 1295</span>
+</div>
+			
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		
+<div id="post_detail">
+<!--done-->
+<div id="topics">
+	<div class = "post">
+		<h1 class = "postTitle">
+			<a id="cb_post_title_url" class="postTitle2" href="http://www.cnblogs.com/xing901022/p/4354529.html">JSP中文乱码问题</a>
+		</h1>
+		<div class="clear"></div>
+		<div class="postBody">
+			<div id="cnblogs_post_body"><p>&nbsp;</p>
+<blockquote>
+<p>之前总是碰到JSP页面乱码的问题，每次都是现在网上搜，然后胡乱改，改完也不明白原因。</p>
+<p>这次正好作下总结，中文乱码就是因为编码不符，可能出现乱码有四个地方：</p>
+<p><span style="color: #ff0000;">1 JSP编码乱码</span></p>
+<p><span style="color: #ff0000;">2 HTML编码乱码</span></p>
+<p><span style="color: #ff0000;">3 request获取数据乱码</span></p>
+<p><span style="color: #ff0000;">4 response输出信息乱码</span></p>
+<p><span style="color: #ff0000;">5 Cookie导致的编码问题</span></p>
+<p>下面将会对上面几种情况进行介绍:</p>
+</blockquote>
+<h2>　　JSP乱码</h2>
+<p>　　这种是最常见的，设置编码的位置位于JSP的第一行，如果在Eclipse中新建一个JSP默认是下面这种：</p>
+<div class="cnblogs_code">
+<pre><span style="background-color: #ffff00; color: #000000;">&lt;%</span><span style="background-color: #f5f5f5; color: #000000;">@ page language</span><span style="background-color: #f5f5f5; color: #000000;">=</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #f5f5f5; color: #800000;">java</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #f5f5f5; color: #000000;"> contentType</span><span style="background-color: #f5f5f5; color: #000000;">=</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #f5f5f5; color: #800000;">text/html; charset=ISO-8859-1</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #f5f5f5; color: #000000;"> pageEncoding</span><span style="background-color: #f5f5f5; color: #000000;">=</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #f5f5f5; color: #800000;">ISO-8859-1</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #ffff00; color: #000000;">%&gt;</span></pre>
+</div>
+<p>　　可以看到它默认的页面编码和传输编码都是ISO-8859-1,这是用于欧洲国家的编码。</p>
+<p>　　可以通过设置Eclipse中JSP的编码格式，来修改默认生成的编码格式。</p>
+<p><img src="http://images.cnitblog.com/blog2015/449064/201503/202010324536443.jpg" alt="" width="505" height="531" /></p>
+<p>　　如果想要支持中文，可以使用<span style="color: #ff0000;">UTF-8、GB2312、GBK</span>等，其中UTF-8是国际化的，哪个国家的都支持，所以推荐使用这个。</p>
+<p>　　再来说说上面涉及到编码的两个地方：<span style="color: #ff0000;">charset&nbsp;</span>和&nbsp;<span style="color: #ff0000;">pageEncoding</span></p>
+<p><span style="font-size: 13px; color: #000080;">　　charset是指服务器发往客户端展现时的编码；</span></p>
+<p><span style="font-size: 13px; color: #000080;">　　pageEncoding用于设置JSP页面本身的编码。</span></p>
+<p>&nbsp;</p>
+<p>　　JSP在部署后提供给用户使用，会经过<strong>三个阶段</strong>：</p>
+<p><span style="font-size: 13px; color: #000080;">　　1 JSP生成java文件：这个阶段会使用pageEncoding所定义的编码格式进行转换</span></p>
+<p><span style="font-size: 13px; color: #000080;">　　2 java文件生成class文件：这个阶段由服务器tomcat自动使用utf-8编码把java文件转换成字节码class文件　　</span></p>
+<p><span style="font-size: 13px; color: #000080;">　　3 通过读取class文件展现给用户：这个阶段由tomcat服务器获取字节码内容，通过使用contentType所定义的编码格式展现给用户。</span></p>
+<p>　　大致过程如下图：</p>
+<p><img src="http://images.cnitblog.com/blog2015/449064/201503/202020262036170.jpg" alt="" width="624" height="379" /></p>
+<p>　　这样设置好JSP中的第一行代码，就可以保证基本的JSP展现没有乱码了！</p>
+<div class="cnblogs_code">
+<pre><span style="background-color: #ffff00; color: #000000;">&lt;%</span><span style="background-color: #f5f5f5; color: #000000;">@ page language</span><span style="background-color: #f5f5f5; color: #000000;">=</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #f5f5f5; color: #800000;">java</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #f5f5f5; color: #000000;"> contentType</span><span style="background-color: #f5f5f5; color: #000000;">=</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #f5f5f5; color: #800000;">text/html; charset=UTF-8</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #f5f5f5; color: #000000;"> pageEncoding</span><span style="background-color: #f5f5f5; color: #000000;">=</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #f5f5f5; color: #800000;">UTF-8</span><span style="background-color: #f5f5f5; color: #800000;">"</span><span style="background-color: #ffff00; color: #000000;">%&gt;</span></pre>
+</div>
+<h2>　　HTML乱码</h2>
+<p>　　因为JSP中也包含html的内容，HTML本身也是有编码格式的。</p>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">&lt;</span><span style="color: #800000;">html</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">meta </span><span style="color: #ff0000;">http-equiv</span><span style="color: #0000ff;">="Content-Type"</span><span style="color: #ff0000;"> content</span><span style="color: #0000ff;">="text/html; charset=UTF-8"</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;</span>Insert title here<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+
+<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">html</span><span style="color: #0000ff;">&gt;</span></pre>
+</div>
+<p>　　如果这部分编码出现问题，那么html中标签的中文命名就会出现乱码。</p>
+<p>　　html中因为只涉及到表现层，所以只有一个属性content中charset，这个编码格式设置对了，就没问题了。</p>
+<h2>　　request中文乱码</h2>
+<p>　　有时候在做jsp逻辑处理时，比如提交表单，从前台注册的页面提交了一部分的数据，但是后面处理的JSP页面通过&nbsp;<span style="color: #ff0000;">request.getParameter&nbsp;</span>调用时，获取到的是一堆乱码。</p>
+<p>　　这是因为虽然前面JSP设置了编码格式，却没有在当前的JSP中设置读取数据的编码格式。</p>
+<p>　　使用下面的代码，就可以是设置request获取请求内容的数据编码：</p>
+<div class="cnblogs_code">
+<pre>request.setCharacterEncoding("utf-8");</pre>
+</div>
+<p>　　</p>
+<p>　　需要注意的是，这种方式对 <span style="color: #ff0000;">URL传参这种JSP请求</span> 是没有作用的。比如：</p>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">&lt;</span><span style="color: #800000;">a </span><span style="color: #ff0000;">href</span><span style="color: #0000ff;">="jspRequest.jsp?username=lisi"</span><span style="color: #0000ff;">&gt;</span>url test request(en)<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">a </span><span style="color: #ff0000;">href</span><span style="color: #0000ff;">="jspRequest.jsp?username=李四"</span><span style="color: #0000ff;">&gt;</span>url test request(zh)<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span></pre>
+</div>
+<p>　　这种情况仍然会出现乱码，这种URL传参的方式，只能修改服务器tomcat的传输编码格式。</p>
+<p>　　修改tomcat安装文件&nbsp;<strong><span style="color: #ff0000;">apache-tomcat-6.0.43\conf&nbsp;</span></strong>目录下的<strong><span style="color: #ff0000;">server.xml</span></strong></p>
+<p><strong><span style="color: #ff0000;"><img src="http://images.cnitblog.com/blog2015/449064/201503/202030081092347.jpg" alt="" width="756" height="105" /></span></strong></p>
+<p>　　添加&nbsp;<span style="color: #ff0000;">URIEncoding="UTF-8"&nbsp;</span>,就可以处理URL传递参数造成的中文乱码问题了。</p>
+<h2>　　response输出中文乱码</h2>
+<p>　　可能现在已经没有多少使用这种方式输出页面的了，但是还是有必要说一下，response输出页面元素内容时，也会出现乱码。</p>
+<p>　　使用下面代码就可以设置response输出的编码格式：</p>
+<div class="cnblogs_code">
+<pre>response.setContentType("text/html;charset=utf-8");</pre>
+</div>
+<h2>　　cookie造成的中文乱码</h2>
+<p>　　Cookie由于需要保存在客户端中，因此使用过程中都需要编码以及转码：</p>
+<p><strong>　　在保存Cookie数据前</strong></p>
+<p><span style="font-size: 13px; color: #000080;">　　首先引入java.net.*,该包中包含URLEncoder类；</span></p>
+<p><span style="font-size: 13px; color: #000080;">　　保证response与request的编码正确；</span></p>
+<p><span style="font-size: 13px; color: #000080;">　　使用URLEncoder进行转码，并保存。</span></p>
+<div class="cnblogs_code">
+<pre>&lt;%@ page language="java" contentType="text/html; charset=utf-8"
+    <span style="color: #0000ff;">import</span>="java.net.*"<span style="color: #000000;">
+    pageEncoding</span>="utf-8"%&gt;
+&lt;%
+<span style="color: #008000;">//</span><span style="color: #008000;">保证request以及response的编码 </span>
+request.setCharacterEncoding("utf-8"<span style="color: #000000;">);
+response.setContentType(</span>"text/html;charset=utf-8"<span style="color: #000000;">);
+
+</span><span style="color: #008000;">//</span><span style="color: #008000;">使用URLEncoder解决cookie中中文问题</span>
+String username = URLEncoder.encode(request.getParameter("username"),"utf-8"<span style="color: #000000;">);
+String password </span>= URLEncoder.encode(request.getParameter("password"),"utf-8"<span style="color: #000000;">);
+            
+Cookie usernameCookie </span>= <span style="color: #0000ff;">new</span> Cookie("username"<span style="color: #000000;">,username);
+Cookie passwordCookie </span>= <span style="color: #0000ff;">new</span> Cookie("password"<span style="color: #000000;">,password);
+usernameCookie.setMaxAge(</span>864000<span style="color: #000000;">);
+passwordCookie.setMaxAge(</span>864000<span style="color: #000000;">);
+            
+response.addCookie(usernameCookie);
+response.addCookie(passwordCookie);
+</span>%&gt;</pre>
+</div>
+<p>　　在使用Cookie数据前</p>
+<p><span style="font-size: 13px; color: #000080;">　　依然要注意导入必备的包：java.net.*</span></p>
+<p><span style="font-size: 13px; color: #000080;">　　注意request的编码；</span></p>
+<p><span style="font-size: 13px; color: #000080;">　　使用URLDecoder进行解码</span></p>
+<div class="cnblogs_code">
+<pre>&lt;%@ page language="java" import="java.util.*,java.io.*,java.net.*" contentType="text/html; charset=utf-8"%&gt;<br />&lt;%<span style="color: #000000;">
+        request.setCharacterEncoding(</span>"utf-8"<span style="color: #000000;">);
+    
+        String username </span>= ""<span style="color: #000000;">;
+        String password </span>= ""<span style="color: #000000;">;
+
+        Cookie[] cookies </span>=<span style="color: #000000;"> request.getCookies();
+        </span><span style="color: #0000ff;">if</span>(cookies!=<span style="color: #0000ff;">null</span> &amp;&amp; cookies.length&gt;0<span style="color: #000000;">){
+            </span><span style="color: #0000ff;">for</span><span style="color: #000000;">(Cookie c:cookies){
+                </span><span style="color: #0000ff;">if</span>(c.getName().equals("username"<span style="color: #000000;">)){
+                    username </span>= URLDecoder.decode(c.getValue(),"utf-8"<span style="color: #000000;">);
+                    System.out.println(username);
+                }
+                </span><span style="color: #0000ff;">if</span>(c.getName().equals("password"<span style="color: #000000;">)){
+                    password </span>= URLDecoder.decode(c.getValue(),"utf-8"<span style="color: #000000;">);
+                }
+            }
+        }
+</span>%&gt;</pre>
+</div>
+<p>&nbsp;</p>
+<h2>　　参考</h2>
+<p>　　【1】JSP中pageEncoding与ContentType的区别：http://blog.csdn.net/dragon4s/article/details/6604624</p>
+<p>&nbsp;</p></div><div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory"></div>
+<div id="EntryTag"></div>
+<div id="blog_post_info">
+</div>
+<div class="clear"></div>
+<div id="post_next_prev"></div>
+</div>
+
+
+		</div>
+		<div class = "postDesc">posted @ <span id="post-date">2015-03-20 20:38</span> <a href='http://www.cnblogs.com/xing901022/'>xingoo</a> 阅读(<span id="post_view_count">...</span>) 评论(<span id="post_comment_count">...</span>)  <a href ="https://i.cnblogs.com/EditPosts.aspx?postid=4354529" rel="nofollow">编辑</a> <a href="#" onclick="AddToWz(4354529);return false;">收藏</a></div>
+	</div>
+	<script type="text/javascript">var allowComments=true,cb_blogId=128528,cb_entryId=4354529,cb_blogApp=currentBlogApp,cb_blogUserGuid='08d856da-3501-e211-aa3f-842b2b196315',cb_entryCreatedDate='2015/3/20 20:38:00';loadViewCount(cb_entryId);</script>
+	
+</div><!--end: topics 文章、评论容器-->
+</div><a name="!comments"></a><div id="blog-comments-placeholder"></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id='comment_form' class='commentform'>
+<a name='commentform'></a>
+<div id='divCommentShow'></div>
+<div id='comment_nav'><span id='span_refresh_tips'></span><a href='javascript:void(0);' onclick='return RefreshCommentList();' id='lnk_RefreshComments' runat='server' clientidmode='Static'>刷新评论</a><a href='#' onclick='return RefreshPage();'>刷新页面</a><a href='#top'>返回顶部</a></div>
+<div id='comment_form_container'></div>
+<div class='ad_text_commentbox' id='ad_text_under_commentbox'></div>
+<div id='ad_t2'></div>
+<div id='opt_under_post'></div>
+<div id='ad_c1' class='c_ad_block'></div>
+<div id='under_post_news'></div>
+<div id='ad_c2' class='c_ad_block'></div>
+<div id='under_post_kb'></div>
+<div id='HistoryToday' class='c_ad_block'></div>
+<script type='text/javascript'>
+    fixPostBody();
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);   
+</script>
+</div>
+
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+
+	<div id="sideBar">
+		<div id="sideBarMain">
+			
+<!--done-->
+<div class="newsItem">
+<h3 class="catListTitle">公告</h3>
+	<div id="blog-news"></div><script type="text/javascript">loadBlogNews();</script>
+</div>
+
+			<div id="blog-calendar" style="display:none"></div><script type="text/javascript">loadBlogDefaultCalendar();</script>
+			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div><script type="text/javascript">loadBlogSideColumn();</script>
+			</div>
+			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		
+<!--done-->
+Copyright &copy;2017 xingoo
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+</body>
+</html>
